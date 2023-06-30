@@ -134,7 +134,19 @@ public:
         // TODO number 1
         // Implement this function to take the "which"th value from MULTIPLIERS and multiply each character
         //  in string x to that multiplier value adding it up with hashVal
+
+        int multiplier = -1;
+        if (MULTIPLIERS.size() < which + 1) {
+            return -1;
+        } else {
+            multiplier = MULTIPLIERS[which];
+        }
         size_t hashVal = 0;
+
+        for (char c : x) {
+            hashVal += c *  multiplier;
+        }
+
         return hashVal;
     }
 
@@ -180,12 +192,54 @@ public:
     bool insert(T &&x) {
         // TODO number 2
         //Make sure you dont insert stuff that are already in the table and make sure the table is not too crowded.
-        const int COUNT_LIMIT = 100;
+        if (this->contains(x)) {
+            return false;
+        }
         // in a while true loop for numHashFunctions times try to find the hash value of the item x
         // and place it into the array object. If you went over all the numHashFunctions different hash values,
         // evict one of the numHashFunctions possible items and place in x, now try to place in the evicted item.
         // you can allow this eviction process to reoccur for COUNT_LIMIT number of times, if you didn't get out by then
         // you know what to do ...
+        const int COUNT_LIMIT = 100;
+
+        int hashFunctionLim = numHashFunctions;
+        int counter = 0;
+        bool inserted = false;
+        while (true) {
+            if (counter >= hashFunctionLim) {
+                //resize
+                counter = 0;
+                expand();
+            }
+            if (counter >= COUNT_LIMIT) {
+                //resize
+                counter = 0;
+                expand();
+            }
+            size_t hashed = this->myhash(x, counter);
+
+
+            if (array[hashed].isActive) {
+                string evictedCopy = array[hashed].element;
+                array[hashed].element = x;
+                array[hashed].isActive = true;
+                x = evictedCopy;
+            } else {
+                //When Insertion is completed without eviction, break out of the loop
+                array[hashed].element = x;
+                array[hashed].isActive = true;
+                inserted = true;
+                counter = 0;
+            }
+
+
+            if (inserted) {
+                break;
+            }
+            counter++;
+        }
+
+
         return false;
     }
 
@@ -215,6 +269,8 @@ public:
             else
                 os << " | " << "[]";
         }
+        os << " size: " << array.size();
+
         os << endl;
         return os.str();
     }
