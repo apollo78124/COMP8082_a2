@@ -269,8 +269,6 @@ public:
             else
                 os << " | " << "[]";
         }
-        os << " size: " << array.size();
-
         os << endl;
         return os.str();
     }
