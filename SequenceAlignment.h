@@ -35,11 +35,124 @@ using namespace std;
 
 int alignSequenceAndGetMinCost(string &s1, string &s2, int mismatch_penalty, int gap_penalty) {
     // TODO use the given mismatch_penalty and gap_penalty to calculate the alignment cost.
-    for (char& ch : s1)
-    	ch = '_';
-    for (char& ch : s2)
-    	ch = '_';
-    return 42;
+
+
+    int m = s1.length();
+    int n = s2.length();
+
+    // table for storing optimal substructure answers
+    int dp[n+m+1][n+m+1] = {0};
+    int i = 0;
+    // Initialize the table.
+    for (i = 0; i <= (n+m); i++)
+    {
+        dp[i][0] = i * gap_penalty;
+        dp[0][i] = i * gap_penalty;
+    }
+    int j = 0;
+
+    // Calculate minimum penalty.
+    for (i = 1; i <= m; i++)
+    {
+        for (j = 1; j <= n; j++)
+        {
+            if ((int)s1[i - 1] == (int)s2[j - 1])
+            {
+                dp[i][j] = dp[i - 1][j - 1];
+            }
+            else
+            {
+                /**
+                 * Get minimum from 3 possible choice:
+                 * 1. xm and ym
+                 * 2. xm and gap
+                 * 3. gap and yn
+                 */
+                dp[i][j] = min({
+                                dp[i - 1][j] + gap_penalty    ,
+                                dp[i][j - 1] + gap_penalty  ,
+                                dp[i - 1][j - 1] + mismatch_penalty
+                });
+            }
+        }
+    }
+
+    int l = n + m; // maximum possible length
+
+    i = m; j = n;
+
+    int xpos = l;
+    int ypos = l;
+
+    // string to store results
+    int s1Ans[l + 1], s2Ans[l + 1];
+
+    while ( !(i == 0 || j == 0))
+    {
+        if (dp[i - 1][j] + gap_penalty == dp[i][j])
+        {
+            s1Ans[xpos--] = (int)s1[i - 1];
+            s2Ans[ypos--] = (int)'_';
+            i--;
+        }
+        else if (dp[i][j - 1] + gap_penalty == dp[i][j])
+        {
+            s1Ans[xpos--] = (int)'_';
+            s2Ans[ypos--] = (int)s2[j - 1];
+            j--;
+        }
+        else if (dp[i - 1][j - 1] + mismatch_penalty == dp[i][j])
+        {
+            s1Ans[xpos--] = (int)s1[i - 1];
+            s2Ans[ypos--] = (int)s2[j - 1];
+            i--; j--;
+        }
+        else if (s1[i - 1] == s2[j - 1])
+        {
+            s1Ans[xpos--] = (int)s1[i - 1];
+            s2Ans[ypos--] = (int)s2[j - 1];
+            i--; j--;
+        }
+
+    }
+    while (xpos > 0)
+    {
+        if (i > 0) s1Ans[xpos--] = (int)s1[--i];
+        else s1Ans[xpos--] = (int)'_';
+    }
+    while (ypos > 0)
+    {
+        if (j > 0) s2Ans[ypos--] = (int)s2[--j];
+        else s2Ans[ypos--] = (int)'_';
+    }
+
+    /**
+     * Removing extra gaps caused from extra characters to allow maximum possible length.
+     */
+    int id = 1;
+    for (i = l; i >= 1; i--)
+    {
+        if ((char)s2Ans[i] == '_' && (char)s1Ans[i] == '_')
+        {
+            id = i + 1;
+            break;
+        }
+    }
+    string result1 = "";
+    for (i = id; i <= l; i++)
+    {
+        result1 += (char)s1Ans[i];
+    }
+    s1 = result1;
+
+    string result2 = "";
+    for (i = id; i <= l; i++)
+    {
+        result2 += (char)s2Ans[i];
+    }
+    s2 = result2;
+
+    return dp[m][n];
 }
 
 #endif //SEQUENCEALIGNMENT_H

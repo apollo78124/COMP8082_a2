@@ -30,7 +30,8 @@ int main() {
      */
     cout << "***** Part 2: Topological Sorting *****" << endl;
 
-    int adjacencyMatrix[4][4] = {0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0};
+   // int adjacencyMatrix[4][4] = {0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0};
+    int adjacencyMatrix[4][4] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     int adjacencyMatrix2[7][7] = {0,1,1,1,0,0,0,
                                  0,0,0,1,1,0,0,
                                  0,0,0,0,0, 1,0,
@@ -53,24 +54,52 @@ int main() {
      The output of my implementation:
         Result of topological sorting: 0 1 2 3
      */
-//    cout << "***** Part 3: Sequence Alignment *****" << endl;
-//    string s1 = "HELLO";
-//    string s2 = "HeLO";
-//    int penalty_mismatch = 1;
-//    int penalty_gap = 2;
-//    cout << s1 << endl;
-//    cout << s2 << endl;
-//    int cost = alignSequenceAndGetMinCost(s1, s2, penalty_mismatch, penalty_gap);
-//    cout << s1 << endl;
-//    cout << s2 << endl;
-//    cout << cost << endl;
-//    /*
-//    The output of my implementation:
-//     HELLO
-//     HeLO
-//     HEL_LO
-//     H__eLO
-//     3
-//    */
+    cout << "***** Part 3: Sequence Alignment *****" << endl;
+    string s1 = "HELLO";
+    string s2 = "HeLO";
+    int penalty_mismatch = 1;
+    int penalty_gap = 2;
+    cout << s1 << endl;
+    cout << s2 << endl;
+    int cost = alignSequenceAndGetMinCost(s1, s2, penalty_mismatch, penalty_gap);
+    cout << s1 << endl;
+    cout << s2 << endl;
+    cout << cost << endl;
+
+
+    s1 = "HeLLO How AR YOU?";
+    s2 = "HELO How ar yo?";
+    cout << s1 << endl;
+    cout << s2 << endl;
+    penalty_mismatch = 1;
+    penalty_gap = 2;
+    cost = alignSequenceAndGetMinCost(s1, s2, penalty_mismatch, penalty_gap);
+    cout << s1 << endl;
+    cout << s2 << endl;
+    cout << cost << endl;
+
+    s1 = "ATGCTAGT";
+    s2 = "ATGTTAT";
+    cout << s1 << endl;
+    cout << s2 << endl;
+    penalty_mismatch = 1;
+    penalty_gap = 2;
+    cost = alignSequenceAndGetMinCost(s1, s2, penalty_mismatch, penalty_gap);
+    cout << s1 << endl;
+    cout << s2 << endl;
+    cout << cost << endl;
+    /*
+    The output of my implementation:
+     HELLO
+     HeLO
+     HEL_LO
+     H__eLO
+     3
+    */
+    /*
+     *  "HeLLO How AR_ YOU?"
+     *  "HEL_O How are yo_?"
+     *  11
+     */
     return 0;
 }
