@@ -40,14 +40,15 @@ int alignSequenceAndGetMinCost(string &s1, string &s2, int mismatch_penalty, int
     int m = s1.length();
     int n = s2.length();
 
+    int size = n + m + 1;
     // table for storing optimal substructure answers
-    int dp[n+m+1][n+m+1] = {0};
+    int scoreTable[size][size] = {0};
     int i = 0;
     // Initialize the table.
     for (i = 0; i <= (n+m); i++)
     {
-        dp[i][0] = i * gap_penalty;
-        dp[0][i] = i * gap_penalty;
+        scoreTable[i][0] = i * gap_penalty;
+        scoreTable[0][i] = i * gap_penalty;
     }
     int j = 0;
 
@@ -58,7 +59,7 @@ int alignSequenceAndGetMinCost(string &s1, string &s2, int mismatch_penalty, int
         {
             if ((int)s1[i - 1] == (int)s2[j - 1])
             {
-                dp[i][j] = dp[i - 1][j - 1];
+                scoreTable[i][j] = scoreTable[i - 1][j - 1];
             }
             else
             {
@@ -68,10 +69,10 @@ int alignSequenceAndGetMinCost(string &s1, string &s2, int mismatch_penalty, int
                  * 2. xm and gap
                  * 3. gap and yn
                  */
-                dp[i][j] = min({
-                                dp[i - 1][j] + gap_penalty    ,
-                                dp[i][j - 1] + gap_penalty  ,
-                                dp[i - 1][j - 1] + mismatch_penalty
+                scoreTable[i][j] = min({
+                                               scoreTable[i - 1][j] + gap_penalty    ,
+                                               scoreTable[i][j - 1] + gap_penalty  ,
+                                               scoreTable[i - 1][j - 1] + mismatch_penalty
                 });
             }
         }
@@ -89,19 +90,19 @@ int alignSequenceAndGetMinCost(string &s1, string &s2, int mismatch_penalty, int
 
     while ( !(i == 0 || j == 0))
     {
-        if (dp[i - 1][j] + gap_penalty == dp[i][j])
+        if (scoreTable[i - 1][j] + gap_penalty == scoreTable[i][j])
         {
             s1Ans[xpos--] = (int)s1[i - 1];
             s2Ans[ypos--] = (int)'_';
             i--;
         }
-        else if (dp[i][j - 1] + gap_penalty == dp[i][j])
+        else if (scoreTable[i][j - 1] + gap_penalty == scoreTable[i][j])
         {
             s1Ans[xpos--] = (int)'_';
             s2Ans[ypos--] = (int)s2[j - 1];
             j--;
         }
-        else if (dp[i - 1][j - 1] + mismatch_penalty == dp[i][j])
+        else if (scoreTable[i - 1][j - 1] + mismatch_penalty == scoreTable[i][j])
         {
             s1Ans[xpos--] = (int)s1[i - 1];
             s2Ans[ypos--] = (int)s2[j - 1];
@@ -152,7 +153,7 @@ int alignSequenceAndGetMinCost(string &s1, string &s2, int mismatch_penalty, int
     }
     s2 = result2;
 
-    return dp[m][n];
+    return scoreTable[m][n];
 }
 
 #endif //SEQUENCEALIGNMENT_H

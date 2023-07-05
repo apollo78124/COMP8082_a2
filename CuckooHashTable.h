@@ -195,6 +195,10 @@ public:
         if (this->contains(x)) {
             return false;
         }
+        if (currentSize >=array.size() * MAX_LOAD) {
+            expand();
+        }
+
         // in a while true loop for numHashFunctions times try to find the hash value of the item x
         // and place it into the array object. If you went over all the numHashFunctions different hash values,
         // evict one of the numHashFunctions possible items and place in x, now try to place in the evicted item.
@@ -204,6 +208,7 @@ public:
 
         int hashFunctionLim = numHashFunctions;
         int counter = 0;
+        int evictCounter = 0;
         bool inserted = false;
         while (true) {
             if (counter >= hashFunctionLim) {
@@ -216,31 +221,37 @@ public:
                 counter = 0;
                 expand();
             }
-            size_t hashed = this->myhash(x, counter);
 
+            size_t hashed = -1;
+            for (int i = 0; i < hashFunctionLim; ++i) {
+                hashed = this->myhash(x, i);
+                if (!array[hashed].isActive) {
+                    array[hashed].element = x;
+                    array[hashed].isActive = true;
+                    inserted = true;
+                    counter = 0;
+                    currentSize++;
+                    break;
+                }
+            }
 
-            if (array[hashed].isActive) {
+            if (inserted) {
+                break;
+            } else {
+                /**
+                 * Get any random one to evict
+                 */
+                hashed = myhash( x, r.nextInt( hashFunctionLim ));
                 string evictedCopy = array[hashed].element;
                 array[hashed].element = x;
                 array[hashed].isActive = true;
                 x = evictedCopy;
-            } else {
-                //When Insertion is completed without eviction, break out of the loop
-                array[hashed].element = x;
-                array[hashed].isActive = true;
-                inserted = true;
-                counter = 0;
-            }
-
-
-            if (inserted) {
-                break;
+                evictCounter++;
             }
             counter++;
         }
 
-
-        return false;
+        return true;
     }
 
     int size() const {
